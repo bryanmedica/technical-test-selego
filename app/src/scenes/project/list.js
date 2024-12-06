@@ -33,9 +33,24 @@ const ProjectList = () => {
     setActiveProjects(p);
   };
 
+  const handleFilter = (filteredValue) => {
+    let sortedProjects = [...projects]
+    if (filteredValue === "ascending") {
+      sortedProjects.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (filteredValue === "descending") {
+      sortedProjects.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (filteredValue === "last-updated") {
+      sortedProjects.sort((a, b) => new Date(b.last_updated_at) - new Date(a.last_updated_at));
+    } else if (filteredValue === "first-updated") {
+      sortedProjects.sort((a, b) => new Date(a.last_updated_at) - new Date(b.last_updated_at));
+    }
+    setActiveProjects(sortedProjects);
+
+  };
+
   return (
     <div className="w-full p-2 md:!px-8">
-      <Create onChangeSearch={handleSearch} />
+      <Create onChangeSearch={handleSearch} onChangeFilter={handleFilter}  />
       <div className="py-3">
         {activeProjects.map((hit) => {
           return (
@@ -92,7 +107,7 @@ const Budget = ({ project }) => {
   return <ProgressBar percentage={width} max={budget_max_monthly} value={total} />;
 };
 
-const Create = ({ onChangeSearch }) => {
+const Create = ({ onChangeSearch, onChangeFilter }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -114,6 +129,21 @@ const Create = ({ onChangeSearch }) => {
             placeholder="Search"
             onChange={(e) => onChangeSearch(e.target.value)}
           />
+        </div>
+        <div className="flex">
+          <label>
+            Order by :
+            <select
+              className="w-[180px] bg-[#FFFFFF] text-[14px] text-[#212325] font-normal py-2 px-[14px] mx-[14px] rounded-[10px] border-r-[16px] border-[transparent] cursor-pointer"
+              onChange={(e) => onChangeFilter(e.target.value)}
+            >
+              <option disabled>Order</option>
+              <option value="last-updated">Last updated</option>
+              <option value="first-updated">First updated</option>
+              <option value="ascending">Ascending</option>
+              <option value="descending">Descending</option>
+            </select>
+          </label>
         </div>
         {/* Create New Button */}
         <button
